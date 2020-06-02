@@ -2,7 +2,7 @@ from conans import ConanFile, CMake, tools
 
 
 class AppleframeworkConan(ConanFile):
-    name = "apple_framework"
+    name = "hello_framework"
     version = "1.0.0"
     license = "<Put the package license here>"
     url = "<Package recipe repository url here, for issues about the package>"

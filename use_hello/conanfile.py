@@ -2,7 +2,7 @@ from conans import ConanFile, CMake, tools
 
 
 class AppleFrameworkConan(ConanFile):
-    name = "apple_use_framework"
+    name = "use_hello_framework"
     version = "1.0"
     license = "<Put the package license here>"
     author = "<Put your name here> <And your email here>"
@@ -17,7 +17,7 @@ class AppleFrameworkConan(ConanFile):
 
 
     def requirements(self):
-        self.requires('apple_framework/1.0.0@test/test')
+        self.requires('hello_framework/1.0.0@test/test')
 
     def build(self):
         cmake = CMake(self, generator="Xcode")
