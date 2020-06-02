@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 project(apple_app CXX OBJCXX)
 
+# uncomment to make it work on iOS and tvOS
+#set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
