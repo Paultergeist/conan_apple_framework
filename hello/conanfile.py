@@ -14,11 +14,25 @@ class AppleframeworkConan(ConanFile):
     exports_sources = "src/*"
 
     def build(self):
-        cmake = CMake(self)
+        cmake = CMake(self, generator="Xcode")
+        cmake_system_name = {
+            "Macos" : "Darwin",
+            "iOS" : "iOS",
+            "tvOS" : "tvOS",
+            }[str(self.settings.os)] # workaround for already documented #4550
+        archs = {
+            "Macos" : "x86_64",
+            "iOS" : "arm64;x86_64",
+            "tvOS" : "arm64;x86_64",
+            }[str(self.settings.os)]
         xcrun = tools.XCRun(self.settings)
         cmake.definitions.update({
             'CMAKE_OSX_SYSROOT' : xcrun.sdk_path,
-            'CMAKE_OSX_ARCHITECTURES' : tools.to_apple_arch(self.settings.arch),
+            'CMAKE_OSX_ARCHITECTURES' : archs,
+            'CMAKE_OSX_DEPLOYMENT_TARGET' : self.settings.os.version,
+            'CMAKE_SYSTEM_NAME' : cmake_system_name,
+            'CMAKE_IOS_INSTALL_COMBINED' : True,
+            'CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH' : False,
         })
         cmake.configure(source_folder="src")
         cmake.build()
@@ -29,6 +43,10 @@ class AppleframeworkConan(ConanFile):
         # self.run("cmake --build . %s" % cmake.build_config)
         self.run("otool -L %s/lib/hello.framework/hello" % self.build_folder)
         self.run("otool -L %s/hello.framework/hello" % self.package_folder)
+        self.run(f"lipo -info {self.build_folder}/lib/hello.framework/hello")
+        self.run(f"lipo -info {self.package_folder}/hello.framework/hello")
+        self.run(f"otool -arch arm64 -l {self.package_folder}/hello.framework/hello | grep -A4 'VERSION_MIN\|LC_BUILD_VERSION' || true")
+        self.run(f"otool -arch x86_64 -l {self.package_folder}/hello.framework/hello | grep -A4 'VERSION_MIN\|LC_BUILD_VERSION' || true")
 
     #def package(self):
     #    self.copy("*.h", dst="include", src="src")
